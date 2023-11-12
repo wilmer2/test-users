@@ -50,16 +50,23 @@ export class RabbitMqAdapter {
     routingKey: string = '',
     content: any,
   ): Promise<void> {
-    await this.channel.publish(exchange, routingKey, Buffer.from(content));
+    await this.channel.publish(
+      exchange,
+      routingKey,
+      Buffer.from(JSON.stringify(content)),
+    );
   }
 
-  async receiveMessage(queueName: string): Promise<void> {
+  public async receiveMessage(queueName: string): Promise<void> {
     console.log('Waiting for messages...');
 
     await new Promise<void>((resolve) => {
       this.channel.consume(queueName, (msg) => {
-        const message = msg.content.toString();
-        console.log(`Received message: ${message}`);
+        const users = JSON.parse(msg.content.toString());
+        users.map((user) => {
+          console.log('*** user id ***', user.id);
+        });
+
         this.channel.ack(msg);
       });
 
