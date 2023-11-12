@@ -1,4 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { AxiosAdapter } from '../common/adapters/axios.adapter';
 import { RabbitMqAdapter } from '../common/adapters/rabbitmq.adapter';
 import { UserResponse } from './interfaces/user-response.interface';
@@ -8,10 +9,14 @@ import { SortOrder } from '../common/interfaces/sort-order.interface';
 
 @Injectable()
 export class UserService implements OnModuleInit {
+  private url: string;
   constructor(
     private readonly http: AxiosAdapter,
     private readonly broker: RabbitMqAdapter,
-  ) {}
+    private readonly config: ConfigService,
+  ) {
+    this.url = this.config.get('remoteApiUrl');
+  }
 
   public async onModuleInit(): Promise<void> {
     this.broker.connect();
@@ -25,9 +30,7 @@ export class UserService implements OnModuleInit {
   }
 
   public async getUsers(): Promise<IUser[]> {
-    const usersResponse = await this.http.get<UserResponse[]>(
-      'https://jsonplaceholder.typicode.com/users',
-    );
+    const usersResponse = await this.http.get<UserResponse[]>(this.url);
 
     const users: IUser[] = usersResponse.map((user) => {
       const { address, ...userWithoutAddress } = user;

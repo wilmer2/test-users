@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import amqplib, {
   AmqpConnectionManager,
   ChannelWrapper,
@@ -9,9 +10,17 @@ import { QueueBindingParams as IQueueBindingParams } from '../interfaces/rabbitm
 export class RabbitMqAdapter {
   private connection: AmqpConnectionManager;
   private channel: ChannelWrapper;
+  private rabbitmqEndpoint: string;
+
+  constructor(private readonly config: ConfigService) {
+    const port = this.config.get('rabbitmqPort');
+    const endpoint = this.config.get('rabbitmqEndpoint');
+
+    this.rabbitmqEndpoint = `${endpoint}:${port}`;
+  }
 
   public connect(): void {
-    this.connection = amqplib.connect(['amqp://localhost:5673']);
+    this.connection = amqplib.connect([this.rabbitmqEndpoint]);
   }
 
   public createChannel(): void {
