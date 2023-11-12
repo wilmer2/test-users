@@ -20,8 +20,12 @@ export class UserService {
       return userWithoutAddress;
     });
 
-    const orderedUser = sortArrayByProperty<IUser>(users, 'id', SortOrder.Desc);
+    const descendingOrderUsersById = sortArrayByProperty<IUser>(
+      users,
+      'id',
+      SortOrder.Desc,
+    );
 
-    return orderedUser;
+    return descendingOrderUsersById;
   }
 }
