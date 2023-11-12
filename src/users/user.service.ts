@@ -6,10 +6,12 @@ import { UserResponse } from './interfaces/user-response.interface';
 import { User as IUser } from './interfaces/user.interface';
 import { sortArrayByProperty } from '../common/helpers';
 import { SortOrder } from '../common/interfaces/sort-order.interface';
+import { USER_EXCHANGE, USER_QUEUE_REQUEST } from '../common/constants';
 
 @Injectable()
 export class UserService implements OnModuleInit {
   private url: string;
+
   constructor(
     private readonly http: AxiosAdapter,
     private readonly broker: RabbitMqAdapter,
@@ -21,11 +23,11 @@ export class UserService implements OnModuleInit {
   public async onModuleInit(): Promise<void> {
     this.broker.connect();
     this.broker.createChannel();
-    await this.broker.assertExchange('users-tas', 'fanout');
-    await this.broker.assertQueue('cats_queue');
+    await this.broker.assertExchange(USER_EXCHANGE, 'fanout');
+    await this.broker.assertQueue(USER_QUEUE_REQUEST);
     await this.broker.bindToQueue({
-      exchangeName: 'users-tas',
-      queueName: 'cats_queue',
+      exchangeName: USER_EXCHANGE,
+      queueName: USER_QUEUE_REQUEST,
     });
   }
 
@@ -50,6 +52,6 @@ export class UserService implements OnModuleInit {
   public async publishUsers(users: IUser[]): Promise<void> {
     const evenUsers = users.filter((user) => user.id % 2 === 0);
 
-    await this.broker.publish('users-tas', '', evenUsers);
+    await this.broker.publish(USER_EXCHANGE, '', evenUsers);
   }
 }
