@@ -52,4 +52,18 @@ export class RabbitMqAdapter {
   ): Promise<void> {
     await this.channel.publish(exchange, routingKey, Buffer.from(content));
   }
+
+  async receiveMessage(queueName: string): Promise<void> {
+    console.log('Waiting for messages...');
+
+    await new Promise<void>((resolve) => {
+      this.channel.consume(queueName, (msg) => {
+        const message = msg.content.toString();
+        console.log(`Received message: ${message}`);
+        this.channel.ack(msg);
+      });
+
+      resolve();
+    });
+  }
 }

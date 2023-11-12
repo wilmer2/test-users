@@ -43,4 +43,10 @@ export class UserService implements OnModuleInit {
 
     return descendingOrderUsersById;
   }
+
+  public async publishUsers(users: IUser[]): Promise<void> {
+    const evenUsers = users.filter((user) => user.id % 2 === 0);
+
+    await this.broker.publish('users-tas', '', evenUsers);
+  }
 }
