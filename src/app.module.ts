@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { CommonModule } from './common/common.module';
 import { UserModule } from './users/user.module';
 import { UsersRequestedModule } from './users-requested-consumer/users-requested.module';
@@ -18,7 +16,7 @@ import { UsersRequestedPublishModule } from './users-requested-publish/users-req
     UsersRequestedModule,
     UsersRequestedPublishModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
