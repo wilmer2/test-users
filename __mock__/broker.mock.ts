@@ -1,4 +1,4 @@
-export const brokerMock = {
+export const mockBrocker = {
   connect: jest.fn(),
   createChannel: jest.fn(),
   assertExchange: jest.fn(),

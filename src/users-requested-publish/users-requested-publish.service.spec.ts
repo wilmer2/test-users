@@ -1,29 +1,26 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersRequestedPublishService } from './users-requested-publish.service';
-import { usersMock, brokerMock as brokerDataMock } from '../../__mock__';
+import { usersMock, mockBrocker } from '../../__mock__';
 import { UserBrokerEnum } from '../common/constants';
 import { RabbitMqAdapter } from '../common/adapters/rabbitmq.adapter';
 
 describe('UsersRequestedPublishService', () => {
   let service: UsersRequestedPublishService;
-  let brokerMock: jest.Mocked<RabbitMqAdapter>;
+  let brockerService: jest.Mocked<RabbitMqAdapter>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        UsersRequestedPublishService,
-        {
-          provide: RabbitMqAdapter,
-          useValue: { ...brokerDataMock },
-        },
-      ],
-    }).compile();
+      providers: [UsersRequestedPublishService, RabbitMqAdapter],
+    })
+      .overrideProvider(RabbitMqAdapter)
+      .useValue(mockBrocker)
+      .compile();
 
     service = module.get<UsersRequestedPublishService>(
       UsersRequestedPublishService,
     );
 
-    brokerMock = module.get(RabbitMqAdapter);
+    brockerService = module.get(RabbitMqAdapter);
   });
 
   it('should be defined', () => {
@@ -32,12 +29,12 @@ describe('UsersRequestedPublishService', () => {
 
   describe('#publishUsers', () => {
     beforeEach(() => {
-      brokerMock.publish.mockClear();
+      brockerService.publish.mockClear();
     });
 
     it('should call the publish method of the broken', async () => {
       await service.publishUsers(usersMock);
-      expect(brokerMock.publish).toHaveBeenCalled();
+      expect(brockerService.publish).toHaveBeenCalled();
     });
 
     it('Should be called with the correct parameters', async () => {
@@ -45,7 +42,7 @@ describe('UsersRequestedPublishService', () => {
 
       const expectedOrder = usersMock.filter((user) => user.id % 2 === 0);
 
-      expect(brokerMock.publish).toHaveBeenCalledWith(
+      expect(brockerService.publish).toHaveBeenCalledWith(
         UserBrokerEnum.USER_EXCHANGE,
         '',
         expectedOrder,
@@ -55,37 +52,37 @@ describe('UsersRequestedPublishService', () => {
 
   describe('#onModuleInit', () => {
     beforeEach(() => {
-      brokerMock.connect.mockClear();
-      brokerMock.createChannel.mockClear();
-      brokerMock.assertExchange.mockClear();
-      brokerMock.assertQueue.mockClear();
-      brokerMock.bindToQueue.mockClear();
-      brokerMock.receiveMessage.mockClear();
+      brockerService.connect.mockClear();
+      brockerService.createChannel.mockClear();
+      brockerService.assertExchange.mockClear();
+      brockerService.assertQueue.mockClear();
+      brockerService.bindToQueue.mockClear();
+      brockerService.receiveMessage.mockClear();
     });
 
     it('Should call all its internal methods', async () => {
       await service.onModuleInit();
 
-      expect(brokerMock.connect).toHaveBeenCalled();
-      expect(brokerMock.createChannel).toHaveBeenCalled();
-      expect(brokerMock.assertExchange).toHaveBeenCalled();
-      expect(brokerMock.assertQueue).toHaveBeenCalled();
-      expect(brokerMock.bindToQueue).toHaveBeenCalled();
-      expect(brokerMock.receiveMessage).not.toHaveBeenCalled();
+      expect(brockerService.connect).toHaveBeenCalled();
+      expect(brockerService.createChannel).toHaveBeenCalled();
+      expect(brockerService.assertExchange).toHaveBeenCalled();
+      expect(brockerService.assertQueue).toHaveBeenCalled();
+      expect(brockerService.bindToQueue).toHaveBeenCalled();
+      expect(brockerService.receiveMessage).not.toHaveBeenCalled();
     });
 
     it('Should call its internal method with the correct parameters', async () => {
       await service.onModuleInit();
       const exchangeType = 'fanout';
 
-      expect(brokerMock.assertExchange).toHaveBeenCalledWith(
+      expect(brockerService.assertExchange).toHaveBeenCalledWith(
         UserBrokerEnum.USER_EXCHANGE,
         exchangeType,
       );
-      expect(brokerMock.assertQueue).toHaveBeenCalledWith(
+      expect(brockerService.assertQueue).toHaveBeenCalledWith(
         UserBrokerEnum.USER_QUEUE_REQUEST,
       );
-      expect(brokerMock.bindToQueue).toHaveBeenCalledWith({
+      expect(brockerService.bindToQueue).toHaveBeenCalledWith({
         exchangeName: UserBrokerEnum.USER_EXCHANGE,
         queueName: UserBrokerEnum.USER_QUEUE_REQUEST,
       });
