@@ -3,11 +3,13 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { ConfigModule } from '@nestjs/config';
 import { CommonModule } from '../common/common.module';
+import { UsersRequestedPublishService as UserPublish } from '../users-requested-publish/users-requested-publish.service';
 import { usersMock } from '../../__mock__';
 
 describe('UserController', () => {
   let controller: UserController;
   let userService: jest.Mocked<UserService>;
+  let userPublishService: jest.Mocked<UserPublish>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -18,6 +20,11 @@ describe('UserController', () => {
           provide: UserService,
           useFactory: () => ({
             getUsers: jest.fn(),
+          }),
+        },
+        {
+          provide: UserPublish,
+          useFactory: () => ({
             publishUsers: jest.fn(),
           }),
         },
@@ -26,6 +33,7 @@ describe('UserController', () => {
 
     controller = module.get<UserController>(UserController);
     userService = module.get(UserService);
+    userPublishService = module.get(UserPublish);
   });
 
   it('should be defined', () => {
@@ -36,18 +44,18 @@ describe('UserController', () => {
     beforeEach(() => {
       userService.getUsers.mockClear();
       userService.getUsers.mockResolvedValue(usersMock);
-      userService.publishUsers.mockClear();
+      userPublishService.publishUsers.mockClear();
     });
 
     it('Should call all its internal methods', async () => {
       await controller.getUsers();
       expect(userService.getUsers).toHaveBeenCalled();
-      expect(userService.publishUsers).toHaveBeenCalled();
+      expect(userPublishService.publishUsers).toHaveBeenCalled();
     });
 
     it('Should call all its internal methods', async () => {
       await controller.getUsers();
-      expect(userService.publishUsers).toHaveBeenCalledWith(usersMock);
+      expect(userPublishService.publishUsers).toHaveBeenCalledWith(usersMock);
     });
   });
 });
