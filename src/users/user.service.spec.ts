@@ -1,33 +1,34 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
 import { UserService } from './user.service';
-import { AxiosAdapter } from '../common/adapters/axios.adapter';
 import {
   mockUsers,
-  mockHttp,
+  mockUserResponse,
   mockUserPublish,
   mockUsersPair,
+  mockUserRepository,
 } from '../../__mock__';
 import { UsersRequestedPublishService as UserPublishService } from '../users-requested-publish/users-requested-publish.service';
+import { UserRepository } from './user.repository';
 
 describe('UserService', () => {
   let service: UserService;
-  let httpService: jest.Mocked<AxiosAdapter>;
+  let userRepository: jest.Mocked<UserRepository>;
   let userPublishService: jest.Mocked<UserPublishService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [ConfigModule],
-      providers: [UserService, AxiosAdapter, UserPublishService],
+      providers: [UserService, UserRepository, UserPublishService],
     })
-      .overrideProvider(AxiosAdapter)
-      .useValue(mockHttp)
+      .overrideProvider(UserRepository)
+      .useValue(mockUserRepository)
       .overrideProvider(UserPublishService)
       .useValue(mockUserPublish)
       .compile();
 
     service = module.get<UserService>(UserService);
-    httpService = module.get(AxiosAdapter);
+    userRepository = module.get(UserRepository);
     userPublishService = module.get(UserPublishService);
   });
 
@@ -37,12 +38,12 @@ describe('UserService', () => {
 
   describe('#getUsers()', () => {
     beforeEach(() => {
-      httpService.get.mockResolvedValue(mockUsers);
+      userRepository.getUsers.mockResolvedValue(mockUserResponse);
     });
 
     it('should call the get method of the HTTP service', async () => {
       await service.getUsers();
-      expect(httpService.get).toHaveBeenCalled();
+      expect(userRepository.getUsers).toHaveBeenCalled();
     });
 
     it('should fetch users', async () => {
