@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersRequestedPublishService } from './users-requested-publish.service';
 import { usersMock, brokerMock as brokerDataMock } from '../../__mock__';
-import { USER_EXCHANGE, USER_QUEUE_REQUEST } from '../common/constants';
+import { UserBrokerEnum } from '../common/constants';
 import { RabbitMqAdapter } from '../common/adapters/rabbitmq.adapter';
 
 describe('UsersRequestedPublishService', () => {
@@ -46,7 +46,7 @@ describe('UsersRequestedPublishService', () => {
       const expectedOrder = usersMock.filter((user) => user.id % 2 === 0);
 
       expect(brokerMock.publish).toHaveBeenCalledWith(
-        USER_EXCHANGE,
+        UserBrokerEnum.USER_EXCHANGE,
         '',
         expectedOrder,
       );
@@ -79,13 +79,15 @@ describe('UsersRequestedPublishService', () => {
       const exchangeType = 'fanout';
 
       expect(brokerMock.assertExchange).toHaveBeenCalledWith(
-        USER_EXCHANGE,
+        UserBrokerEnum.USER_EXCHANGE,
         exchangeType,
       );
-      expect(brokerMock.assertQueue).toHaveBeenCalledWith(USER_QUEUE_REQUEST);
+      expect(brokerMock.assertQueue).toHaveBeenCalledWith(
+        UserBrokerEnum.USER_QUEUE_REQUEST,
+      );
       expect(brokerMock.bindToQueue).toHaveBeenCalledWith({
-        exchangeName: USER_EXCHANGE,
-        queueName: USER_QUEUE_REQUEST,
+        exchangeName: UserBrokerEnum.USER_EXCHANGE,
+        queueName: UserBrokerEnum.USER_QUEUE_REQUEST,
       });
     });
   });

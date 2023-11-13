@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersRequestedService } from './users-requested.service';
 import { RabbitMqAdapter } from '../common/adapters/rabbitmq.adapter';
-import { USER_EXCHANGE, USER_QUEUE_REQUEST } from '../common/constants';
+import { UserBrokerEnum } from '../common/constants';
 import { brokerMock as brokerMockData } from '../../__mock__';
 
 describe('UsersRequestedService', () => {
@@ -54,17 +54,19 @@ describe('UsersRequestedService', () => {
       const exchangeType = 'fanout';
 
       expect(brokerMock.assertExchange).toHaveBeenCalledWith(
-        USER_EXCHANGE,
+        UserBrokerEnum.USER_EXCHANGE,
         exchangeType,
       );
-      expect(brokerMock.assertQueue).toHaveBeenCalledWith(USER_QUEUE_REQUEST);
+      expect(brokerMock.assertQueue).toHaveBeenCalledWith(
+        UserBrokerEnum.USER_QUEUE_REQUEST,
+      );
       expect(brokerMock.bindToQueue).toHaveBeenCalledWith({
-        exchangeName: USER_EXCHANGE,
-        queueName: USER_QUEUE_REQUEST,
+        exchangeName: UserBrokerEnum.USER_EXCHANGE,
+        queueName: UserBrokerEnum.USER_QUEUE_REQUEST,
       });
 
       expect(brokerMock.receiveMessage).toHaveBeenCalledWith(
-        USER_QUEUE_REQUEST,
+        UserBrokerEnum.USER_QUEUE_REQUEST,
       );
     });
   });
