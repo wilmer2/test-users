@@ -4,10 +4,11 @@ import amqplib, {
   AmqpConnectionManager,
   ChannelWrapper,
 } from 'amqp-connection-manager';
-import { QueueBindingParams as IQueueBindingParams } from '../interfaces/rabbitmq/queue-binding-params.interface';
+import { QueueBindingParams as IQueueBindingParams } from '../interfaces/queue-binding-params.interface';
+import { BrokerAdapter as IBrokerAdapter } from '../interfaces/broker.adapter.interface';
 
 @Injectable()
-export class RabbitMqAdapter {
+export class RabbitMqAdapter implements IBrokerAdapter {
   private connection: AmqpConnectionManager;
   private channel: ChannelWrapper;
   private rabbitmqEndpoint: string;
