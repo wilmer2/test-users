@@ -86,6 +86,15 @@ describe('UserService', () => {
   });
 
   describe('#onModuleInit', () => {
+    beforeEach(() => {
+      brokerMock.connect.mockClear();
+      brokerMock.createChannel.mockClear();
+      brokerMock.assertExchange.mockClear();
+      brokerMock.assertQueue.mockClear();
+      brokerMock.bindToQueue.mockClear();
+      brokerMock.receiveMessage.mockClear();
+    });
+
     it('Should call all its internal methods', async () => {
       await service.onModuleInit();
 
@@ -94,6 +103,7 @@ describe('UserService', () => {
       expect(brokerMock.assertExchange).toHaveBeenCalled();
       expect(brokerMock.assertQueue).toHaveBeenCalled();
       expect(brokerMock.bindToQueue).toHaveBeenCalled();
+      expect(brokerMock.receiveMessage).not.toHaveBeenCalled();
     });
   });
 
