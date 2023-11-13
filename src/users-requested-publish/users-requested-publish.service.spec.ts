@@ -38,7 +38,7 @@ describe('UsersRequestedPublishService', () => {
     });
 
     it('Should be called with the correct parameters', async () => {
-      await service.publishUsers(mockUsers);
+      await service.publishUsers(mockUsersPair);
 
       expect(brockerService.publish).toHaveBeenCalledWith(
         UserBrokerEnum.USER_EXCHANGE,

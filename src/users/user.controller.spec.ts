@@ -38,12 +38,14 @@ describe('UserController', () => {
     it('Should call all its internal methods', async () => {
       await controller.getUsers();
       expect(userService.getUsers).toHaveBeenCalled();
-      expect(userService.publish).toHaveBeenCalled();
+      expect(userService.publishUsersWithEvenId).toHaveBeenCalled();
     });
 
     it('Should call all its internal methods', async () => {
       await controller.getUsers();
-      expect(userService.publish).toHaveBeenCalledWith(mockUsers);
+      expect(userService.publishUsersWithEvenId).toHaveBeenCalledWith(
+        mockUsers,
+      );
     });
   });
 });

@@ -37,7 +37,9 @@ export class UserService {
     return descendingOrderUsersById;
   }
 
-  public async publish(users: User[]): Promise<void> {
-    await this.userPublishService.publishUsers(users);
+  public async publishUsersWithEvenId(users: User[]): Promise<void> {
+    const evenUsers = users.filter((user) => user.id % 2 === 0);
+
+    await this.userPublishService.publishUsers(evenUsers);
   }
 }

@@ -19,8 +19,6 @@ export class UsersRequestedPublishService {
   }
 
   public async publishUsers(users: User[]): Promise<void> {
-    const evenUsers = users.filter((user) => user.id % 2 === 0);
-
-    await this.broker.publish(UserBrokerEnum.USER_EXCHANGE, '', evenUsers);
+    await this.broker.publish(UserBrokerEnum.USER_EXCHANGE, '', users);
   }
 }
