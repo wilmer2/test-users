@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UserService } from './user.service';
 import { AxiosAdapter } from '../common/adapters/axios.adapter';
 import { RabbitMqAdapter } from '../common/adapters/rabbitmq.adapter';
-import { usersMock } from '../../__mock__/user.mock';
+import { usersMock, brokerMock as brokerDataMock } from '../../__mock__';
 import { USER_EXCHANGE, USER_QUEUE_REQUEST } from '../common/constants';
 
 describe('UserService', () => {
@@ -24,14 +24,7 @@ describe('UserService', () => {
         },
         {
           provide: RabbitMqAdapter,
-          useFactory: () => ({
-            connect: jest.fn(),
-            createChannel: jest.fn(),
-            assertExchange: jest.fn(),
-            assertQueue: jest.fn(),
-            bindToQueue: jest.fn(),
-            publish: jest.fn(),
-          }),
+          useValue: { ...brokerDataMock },
         },
       ],
     }).compile();
