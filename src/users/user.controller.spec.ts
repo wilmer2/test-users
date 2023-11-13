@@ -3,7 +3,7 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { ConfigModule } from '@nestjs/config';
 import { CommonModule } from '../common/common.module';
-import { usersMock } from '../../__mock__/user.mock';
+import { usersMock } from '../../__mock__';
 
 describe('UserController', () => {
   let controller: UserController;
