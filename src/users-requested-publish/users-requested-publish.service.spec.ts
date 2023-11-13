@@ -50,12 +50,7 @@ describe('UsersRequestedPublishService', () => {
 
   describe('#onModuleInit', () => {
     beforeEach(() => {
-      brockerService.connect.mockClear();
-      brockerService.createChannel.mockClear();
-      brockerService.assertExchange.mockClear();
-      brockerService.assertQueue.mockClear();
-      brockerService.bindToQueue.mockClear();
-      brockerService.receiveMessage.mockClear();
+      jest.clearAllMocks();
     });
 
     it('Should call all its internal methods', async () => {

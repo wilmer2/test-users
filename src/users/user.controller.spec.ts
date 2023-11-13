@@ -31,9 +31,8 @@ describe('UserController', () => {
 
   describe('#getUsers()', () => {
     beforeEach(() => {
-      userService.getUsers.mockClear();
+      jest.clearAllMocks();
       userService.getUsers.mockResolvedValue(mockUsers);
-      userService.publish.mockClear();
     });
 
     it('Should call all its internal methods', async () => {
