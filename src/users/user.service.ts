@@ -5,6 +5,7 @@ import { UserResponse } from './interfaces/user-response.interface';
 import { User } from './interfaces/user.interface';
 import { sortArrayByProperty } from '../common/helpers';
 import { SortOrder } from '../common/interfaces/sort-order.interface';
+import { UsersRequestedPublishService as UserPublishService } from '../users-requested-publish/users-requested-publish.service';
 
 @Injectable()
 export class UserService {
@@ -13,6 +14,7 @@ export class UserService {
   constructor(
     private readonly http: AxiosAdapter,
     private readonly config: ConfigService,
+    private readonly userPublishService: UserPublishService,
   ) {
     this.url = this.config.get('remoteApiUrl');
   }
@@ -33,5 +35,9 @@ export class UserService {
     );
 
     return descendingOrderUsersById;
+  }
+
+  public async publish(users: User[]): Promise<void> {
+    await this.userPublishService.publishUsers(users);
   }
 }

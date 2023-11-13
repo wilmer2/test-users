@@ -4,12 +4,11 @@ import { UserService } from './user.service';
 import { ConfigModule } from '@nestjs/config';
 import { CommonModule } from '../common/common.module';
 import { UsersRequestedPublishService as UserPublish } from '../users-requested-publish/users-requested-publish.service';
-import { mockUsers, mockUserPublish, mockUserService } from '../../__mock__';
+import { mockUsers, mockUserService } from '../../__mock__';
 
 describe('UserController', () => {
   let controller: UserController;
   let userService: jest.Mocked<UserService>;
-  let userPublishService: jest.Mocked<UserPublish>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -19,13 +18,11 @@ describe('UserController', () => {
     })
       .overrideProvider(UserService)
       .useValue(mockUserService)
-      .overrideProvider(UserPublish)
-      .useValue(mockUserPublish)
+
       .compile();
 
     controller = module.get<UserController>(UserController);
     userService = module.get(UserService);
-    userPublishService = module.get(UserPublish);
   });
 
   it('should be defined', () => {
@@ -36,18 +33,18 @@ describe('UserController', () => {
     beforeEach(() => {
       userService.getUsers.mockClear();
       userService.getUsers.mockResolvedValue(mockUsers);
-      userPublishService.publishUsers.mockClear();
+      userService.publish.mockClear();
     });
 
     it('Should call all its internal methods', async () => {
       await controller.getUsers();
       expect(userService.getUsers).toHaveBeenCalled();
-      expect(userPublishService.publishUsers).toHaveBeenCalled();
+      expect(userService.publish).toHaveBeenCalled();
     });
 
     it('Should call all its internal methods', async () => {
       await controller.getUsers();
-      expect(userPublishService.publishUsers).toHaveBeenCalledWith(mockUsers);
+      expect(userService.publish).toHaveBeenCalledWith(mockUsers);
     });
   });
 });
