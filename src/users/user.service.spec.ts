@@ -57,7 +57,6 @@ describe('UserService', () => {
   describe('#publish()', () => {
     it('should call publishUser', async () => {
       await service.publish(mockUsers);
-      expect(userPublishService.publishUsers).toHaveBeenCalled();
       expect(userPublishService.publishUsers).toHaveBeenCalledWith(mockUsers);
     });
   });
