@@ -4,7 +4,7 @@ import { UserService } from './user.service';
 import { ConfigModule } from '@nestjs/config';
 import { CommonModule } from '../common/common.module';
 import { UsersRequestedPublishService as UserPublish } from '../users-requested-publish/users-requested-publish.service';
-import { mockUsers } from '../../__mock__';
+import { mockUsers, mockUserPublish, mockUserService } from '../../__mock__';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -15,21 +15,13 @@ describe('UserController', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [ConfigModule, CommonModule],
       controllers: [UserController],
-      providers: [
-        {
-          provide: UserService,
-          useFactory: () => ({
-            getUsers: jest.fn(),
-          }),
-        },
-        {
-          provide: UserPublish,
-          useFactory: () => ({
-            publishUsers: jest.fn(),
-          }),
-        },
-      ],
-    }).compile();
+      providers: [UserService, UserPublish],
+    })
+      .overrideProvider(UserService)
+      .useValue(mockUserService)
+      .overrideProvider(UserPublish)
+      .useValue(mockUserPublish)
+      .compile();
 
     controller = module.get<UserController>(UserController);
     userService = module.get(UserService);
