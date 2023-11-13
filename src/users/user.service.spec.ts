@@ -4,12 +4,12 @@ import { UserService } from './user.service';
 import { AxiosAdapter } from '../common/adapters/axios.adapter';
 import { RabbitMqAdapter } from '../common/adapters/rabbitmq.adapter';
 import { usersMock } from '../../__mock__/user.mock';
-import { USER_EXCHANGE } from '../common/constants';
+import { USER_EXCHANGE, USER_QUEUE_REQUEST } from '../common/constants';
 
 describe('UserService', () => {
   let service: UserService;
   let httpMock: jest.Mocked<AxiosAdapter>;
-  let broker: jest.Mocked<RabbitMqAdapter>;
+  let brokerMock: jest.Mocked<RabbitMqAdapter>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -38,7 +38,7 @@ describe('UserService', () => {
 
     service = module.get<UserService>(UserService);
     httpMock = module.get(AxiosAdapter);
-    broker = module.get(RabbitMqAdapter);
+    brokerMock = module.get(RabbitMqAdapter);
   });
 
   it('should be defined', () => {
@@ -71,12 +71,12 @@ describe('UserService', () => {
 
   describe('#publishUsers', () => {
     beforeEach(() => {
-      broker.publish.mockClear();
+      brokerMock.publish.mockClear();
     });
 
     it('should call the publish method of the broken', async () => {
       await service.publishUsers(usersMock);
-      expect(broker.publish).toHaveBeenCalled();
+      expect(brokerMock.publish).toHaveBeenCalled();
     });
 
     it('Should be called with the correct parameters', async () => {
@@ -84,11 +84,38 @@ describe('UserService', () => {
 
       const expectedOrder = usersMock.filter((user) => user.id % 2 === 0);
 
-      expect(broker.publish).toHaveBeenCalledWith(
+      expect(brokerMock.publish).toHaveBeenCalledWith(
         USER_EXCHANGE,
         '',
         expectedOrder,
       );
+    });
+  });
+
+  describe('#onModuleInit', () => {
+    it('Should call all its internal methods', async () => {
+      await service.onModuleInit();
+
+      expect(brokerMock.connect).toHaveBeenCalled();
+      expect(brokerMock.createChannel).toHaveBeenCalled();
+      expect(brokerMock.assertExchange).toHaveBeenCalled();
+      expect(brokerMock.assertQueue).toHaveBeenCalled();
+      expect(brokerMock.bindToQueue).toHaveBeenCalled();
+    });
+  });
+
+  it('Should call its internal method with the correct parameters', async () => {
+    await service.onModuleInit();
+    const exchangeType = 'fanout';
+
+    expect(brokerMock.assertExchange).toHaveBeenCalledWith(
+      USER_EXCHANGE,
+      exchangeType,
+    );
+    expect(brokerMock.assertQueue).toHaveBeenCalledWith(USER_QUEUE_REQUEST);
+    expect(brokerMock.bindToQueue).toHaveBeenCalledWith({
+      exchangeName: USER_EXCHANGE,
+      queueName: USER_QUEUE_REQUEST,
     });
   });
 });
