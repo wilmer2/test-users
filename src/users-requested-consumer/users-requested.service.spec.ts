@@ -2,26 +2,23 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UsersRequestedService } from './users-requested.service';
 import { RabbitMqAdapter } from '../common/adapters/rabbitmq.adapter';
 import { UserBrokerEnum } from '../common/constants';
-import { brokerMock as brokerMockData } from '../../__mock__';
+import { mockBrocker } from '../../__mock__';
 
 describe('UsersRequestedService', () => {
   let service: UsersRequestedService;
-  let brokerMock: jest.Mocked<RabbitMqAdapter>;
+  let brockerService: jest.Mocked<RabbitMqAdapter>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [],
-      providers: [
-        UsersRequestedService,
-        {
-          provide: RabbitMqAdapter,
-          useValue: { ...brokerMockData },
-        },
-      ],
-    }).compile();
+      providers: [UsersRequestedService, RabbitMqAdapter],
+    })
+      .overrideProvider(RabbitMqAdapter)
+      .useValue(mockBrocker)
+      .compile();
 
     service = module.get<UsersRequestedService>(UsersRequestedService);
-    brokerMock = module.get(RabbitMqAdapter);
+    brockerService = module.get(RabbitMqAdapter);
   });
 
   it('should be defined', () => {
@@ -30,42 +27,42 @@ describe('UsersRequestedService', () => {
 
   describe('#onModuleInit()', () => {
     beforeEach(() => {
-      brokerMock.connect.mockClear();
-      brokerMock.createChannel.mockClear();
-      brokerMock.assertExchange.mockClear();
-      brokerMock.assertQueue.mockClear();
-      brokerMock.bindToQueue.mockClear();
-      brokerMock.receiveMessage.mockClear();
+      brockerService.connect.mockClear();
+      brockerService.createChannel.mockClear();
+      brockerService.assertExchange.mockClear();
+      brockerService.assertQueue.mockClear();
+      brockerService.bindToQueue.mockClear();
+      brockerService.receiveMessage.mockClear();
     });
 
     it('Should call all its internal methods', async () => {
       await service.onModuleInit();
 
-      expect(brokerMock.connect).toHaveBeenCalled();
-      expect(brokerMock.createChannel).toHaveBeenCalled();
-      expect(brokerMock.assertExchange).toHaveBeenCalled();
-      expect(brokerMock.assertQueue).toHaveBeenCalled();
-      expect(brokerMock.bindToQueue).toHaveBeenCalled();
-      expect(brokerMock.receiveMessage).toHaveBeenCalled();
+      expect(brockerService.connect).toHaveBeenCalled();
+      expect(brockerService.createChannel).toHaveBeenCalled();
+      expect(brockerService.assertExchange).toHaveBeenCalled();
+      expect(brockerService.assertQueue).toHaveBeenCalled();
+      expect(brockerService.bindToQueue).toHaveBeenCalled();
+      expect(brockerService.receiveMessage).toHaveBeenCalled();
     });
 
     it('Should call its internal method with the correct parameters', async () => {
       await service.onModuleInit();
       const exchangeType = 'fanout';
 
-      expect(brokerMock.assertExchange).toHaveBeenCalledWith(
+      expect(brockerService.assertExchange).toHaveBeenCalledWith(
         UserBrokerEnum.USER_EXCHANGE,
         exchangeType,
       );
-      expect(brokerMock.assertQueue).toHaveBeenCalledWith(
+      expect(brockerService.assertQueue).toHaveBeenCalledWith(
         UserBrokerEnum.USER_QUEUE_REQUEST,
       );
-      expect(brokerMock.bindToQueue).toHaveBeenCalledWith({
+      expect(brockerService.bindToQueue).toHaveBeenCalledWith({
         exchangeName: UserBrokerEnum.USER_EXCHANGE,
         queueName: UserBrokerEnum.USER_QUEUE_REQUEST,
       });
 
-      expect(brokerMock.receiveMessage).toHaveBeenCalledWith(
+      expect(brockerService.receiveMessage).toHaveBeenCalledWith(
         UserBrokerEnum.USER_QUEUE_REQUEST,
       );
     });

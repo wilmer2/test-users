@@ -4,7 +4,7 @@ import { UserService } from './user.service';
 import { ConfigModule } from '@nestjs/config';
 import { CommonModule } from '../common/common.module';
 import { UsersRequestedPublishService as UserPublish } from '../users-requested-publish/users-requested-publish.service';
-import { usersMock } from '../../__mock__';
+import { mockUsers } from '../../__mock__';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -43,7 +43,7 @@ describe('UserController', () => {
   describe('#getUsers()', () => {
     beforeEach(() => {
       userService.getUsers.mockClear();
-      userService.getUsers.mockResolvedValue(usersMock);
+      userService.getUsers.mockResolvedValue(mockUsers);
       userPublishService.publishUsers.mockClear();
     });
 
@@ -55,7 +55,7 @@ describe('UserController', () => {
 
     it('Should call all its internal methods', async () => {
       await controller.getUsers();
-      expect(userPublishService.publishUsers).toHaveBeenCalledWith(usersMock);
+      expect(userPublishService.publishUsers).toHaveBeenCalledWith(mockUsers);
     });
   });
 });
