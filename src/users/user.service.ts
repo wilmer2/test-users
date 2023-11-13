@@ -1,26 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { AxiosAdapter } from '../common/adapters/axios.adapter';
-import { UserResponse } from './interfaces/user-response.interface';
 import { User } from './interfaces/user.interface';
 import { sortArrayByProperty } from '../common/helpers';
 import { SortOrder } from '../common/interfaces/sort-order.interface';
 import { UsersRequestedPublishService as UserPublishService } from '../users-requested-publish/users-requested-publish.service';
+import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
-  private url: string;
-
   constructor(
-    private readonly http: AxiosAdapter,
-    private readonly config: ConfigService,
     private readonly userPublishService: UserPublishService,
-  ) {
-    this.url = this.config.get('remoteApiUrl');
-  }
+    private readonly userRepository: UserRepository,
+  ) {}
 
   public async getUsers(): Promise<User[]> {
-    const usersResponse = await this.http.get<UserResponse[]>(this.url);
+    const usersResponse = await this.userRepository.getUsers();
 
     const users: User[] = usersResponse.map((user) => {
       const { address, ...userWithoutAddress } = user;
