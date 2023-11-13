@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { RabbitMqAdapter } from 'src/common/adapters/rabbitmq.adapter';
+import { RabbitMqAdapter } from '../common/adapters/rabbitmq.adapter';
 import { USER_EXCHANGE, USER_QUEUE_REQUEST } from '../common/constants';
 
 @Injectable()
