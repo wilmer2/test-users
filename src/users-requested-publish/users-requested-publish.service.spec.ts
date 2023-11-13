@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersRequestedPublishService } from './users-requested-publish.service';
-import { mockUsers, mockBrocker } from '../../__mock__';
+import { mockUsers, mockBrocker, mockUsersPair } from '../../__mock__';
 import { UserBrokerEnum } from '../common/constants';
 import { RabbitMqAdapter } from '../common/adapters/rabbitmq.adapter';
 
@@ -40,12 +40,10 @@ describe('UsersRequestedPublishService', () => {
     it('Should be called with the correct parameters', async () => {
       await service.publishUsers(mockUsers);
 
-      const expectedOrder = mockUsers.filter((user) => user.id % 2 === 0);
-
       expect(brockerService.publish).toHaveBeenCalledWith(
         UserBrokerEnum.USER_EXCHANGE,
         '',
-        expectedOrder,
+        mockUsersPair,
       );
     });
   });
