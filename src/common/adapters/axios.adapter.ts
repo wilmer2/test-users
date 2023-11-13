@@ -1,9 +1,9 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import axios, { AxiosInstance } from 'axios';
-import { HttpAdapter } from '../interfaces/http.adapter.interface';
+import { HttpAdapter as IHttpAdapter } from '../interfaces/http.adapter.interface';
 
 @Injectable()
-export class AxiosAdapter implements HttpAdapter {
+export class AxiosAdapter implements IHttpAdapter {
   private axios: AxiosInstance = axios;
 
   public async get<T>(url: string): Promise<T> {
