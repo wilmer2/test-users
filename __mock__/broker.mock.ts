@@ -5,4 +5,5 @@ export const brokerMock = {
   assertQueue: jest.fn(),
   bindToQueue: jest.fn(),
   publish: jest.fn(),
+  receiveMessage: jest.fn(),
 };
