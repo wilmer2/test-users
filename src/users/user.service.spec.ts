@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
-import { CommonModule } from '../common/common.module';
 import { UserService } from './user.service';
 import { AxiosAdapter } from '../common/adapters/axios.adapter';
 import { RabbitMqAdapter } from '../common/adapters/rabbitmq.adapter';
 import { usersMock } from '../../__mock__/user.mock';
+import { USER_EXCHANGE } from '../common/constants';
 
 describe('UserService', () => {
   let service: UserService;
@@ -66,6 +66,29 @@ describe('UserService', () => {
       const users = await service.getUsers();
 
       expect(users[0].id).toEqual(usersMock[2].id);
+    });
+  });
+
+  describe('#publishUsers', () => {
+    beforeEach(() => {
+      broker.publish.mockClear();
+    });
+
+    it('should call the publish method of the broken', async () => {
+      await service.publishUsers(usersMock);
+      expect(broker.publish).toHaveBeenCalled();
+    });
+
+    it('Should be called with the correct parameters', async () => {
+      await service.publishUsers(usersMock);
+
+      const expectedOrder = usersMock.filter((user) => user.id % 2 === 0);
+
+      expect(broker.publish).toHaveBeenCalledWith(
+        USER_EXCHANGE,
+        '',
+        expectedOrder,
+      );
     });
   });
 });
