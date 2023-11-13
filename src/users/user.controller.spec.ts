@@ -31,20 +31,21 @@ describe('UserController', () => {
 
   describe('#getUsers()', () => {
     beforeEach(() => {
-      userService.getUsers.mockClear();
+      jest.clearAllMocks();
       userService.getUsers.mockResolvedValue(mockUsers);
-      userService.publish.mockClear();
     });
 
     it('Should call all its internal methods', async () => {
       await controller.getUsers();
       expect(userService.getUsers).toHaveBeenCalled();
-      expect(userService.publish).toHaveBeenCalled();
+      expect(userService.publishUsersWithEvenId).toHaveBeenCalled();
     });
 
     it('Should call all its internal methods', async () => {
       await controller.getUsers();
-      expect(userService.publish).toHaveBeenCalledWith(mockUsers);
+      expect(userService.publishUsersWithEvenId).toHaveBeenCalledWith(
+        mockUsers,
+      );
     });
   });
 });

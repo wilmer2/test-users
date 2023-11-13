@@ -2,7 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
 import { UserService } from './user.service';
 import { AxiosAdapter } from '../common/adapters/axios.adapter';
-import { mockUsers, mockHttp, mockUserPublish } from '../../__mock__';
+import {
+  mockUsers,
+  mockHttp,
+  mockUserPublish,
+  mockUsersPair,
+} from '../../__mock__';
 import { UsersRequestedPublishService as UserPublishService } from '../users-requested-publish/users-requested-publish.service';
 
 describe('UserService', () => {
@@ -56,9 +61,10 @@ describe('UserService', () => {
 
   describe('#publish()', () => {
     it('should call publishUser', async () => {
-      await service.publish(mockUsers);
-      expect(userPublishService.publishUsers).toHaveBeenCalled();
-      expect(userPublishService.publishUsers).toHaveBeenCalledWith(mockUsers);
+      await service.publishUsersWithEvenId(mockUsers);
+      expect(userPublishService.publishUsers).toHaveBeenCalledWith(
+        mockUsersPair,
+      );
     });
   });
 });

@@ -10,7 +10,7 @@ export class UserController {
   public async getUsers(): Promise<User[]> {
     const users = await this.userService.getUsers();
 
-    await this.userService.publish(users);
+    await this.userService.publishUsersWithEvenId(users);
 
     return users;
   }
